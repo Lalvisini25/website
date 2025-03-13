@@ -1,7 +1,8 @@
 <script setup>
-//import { RouterLink } from 'vue-router';
+import { RouterLink } from 'vue-router';
 </script>
 
 <template>
-    <a>asd</a>
+    <RouterLink to="/home">Home    </RouterLink>
+    <RouterLink to="/chat">Chat    </RouterLink>
 </template>
