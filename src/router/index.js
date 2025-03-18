@@ -4,17 +4,23 @@ import NotFoundView from '@/views/NotFoundView.vue';
 import LoginView from '@/views/LoginView.vue';
 import AssignmentsView from '@/views/AssignmentsView.vue';
 import ChatView from '@/views/ChatView.vue';
+import SignupView from '@/views/SignupView.vue';
 
 const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
-            path: '/',
+            path: '/login',
             name: 'login',
             component: LoginView,
         },
         {
-            path: '/home',
+            path: '/signup',
+            name: 'signup',
+            component: SignupView,
+        },
+        {
+            path: '/',
             name: 'home',
             component: HomeView,
         },

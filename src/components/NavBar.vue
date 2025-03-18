@@ -5,4 +5,5 @@ import { RouterLink } from 'vue-router';
 <template>
     <RouterLink to="/home">Home    </RouterLink>
     <RouterLink to="/chat">Chat    </RouterLink>
+    <br />
 </template>
