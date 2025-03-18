@@ -1,32 +1,39 @@
 <script setup>
 import axios from "axios";
-import { ref, reactive } from "vue";
+import { reactive } from "vue";
+import { handleLogin } from "@/utils/auth";
+import { useStore } from "vuex";
 
-const user = {
-  username: ref(""),
-  password: ref(""),
-  permission: ref(""),
-}
+const store = useStore();
 
 const state = reactive({
-  signupResponse: {}
+  signupResponse: "",
+  user: {
+    username: "",
+    password: "",
+    permission: "",
+  }
+
 });
 
 const handleSignup = async () => {
   const signupDetails = {
-    USERNAME: user.username,
-    PASSWORD: user.password,
-    PERMISSIONS: user.permission,
+    USERNAME: state.user.username,
+    PASSWORD: state.user.password,
+    PERMISSIONS: state.user.permission,
   }
   try {
     const response = await axios.post("http://localhost:3000/signup", signupDetails);
     console.log(response);
+    state.signupResponse = response.data;
+    console.log(state.signupResponse.message)
   } catch(error) {
     state.signupResponse = error.response.data;
     console.log(state.signupResponse)
   } finally {
-    if (state.signupResponse.message === "Successfully inserted") {
+    if (state.signupResponse.message.slice(0,21) === "Successfully inserted") {
       console.log('Successful signup');
+      handleLogin(state.user.username, state.user.password, store)
     } else {
       console.log("pass");
   }
@@ -64,13 +71,22 @@ const authenticate = async () => {
 
 <template>
     <h2>Signup:</h2>
-    <input type="text" v-model="username" placeholder="Enter your username" required>
+    <input type="text" v-model="state.user.username" placeholder="Enter your username" required>
     <br />  
-    <input type="password" v-model="password" placeholder="Enter your password" required>
+    <input type="password" v-model="state.user.password" placeholder="Enter your password" required>
     <br />  
-    <input type="text" v-model="username" placeholder="Enter your username" required>
+
+    <label for="pet-select">Choose your role:</label>
+
+    <select v-model="state.user.permission" name="permissions" id="permission-select" required>
+      <option value="">Select</option>
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+      <option value="admin">Admin</option>
+    </select>
+
     <br /><br />
     <button @click="handleSignup">Submit</button>
-    <p>{{ loginResponse }}</p>
+    <p>{{ state.signupResponse }}</p>
     <h4>Hello!</h4>
 </template>

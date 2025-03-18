@@ -2,8 +2,11 @@
 import axios from "axios";
 import { reactive } from "vue";
 import router from "@/router";
+import { useStore } from "vuex";
 
 //Creates user object
+
+const store = useStore();
 
 const state = reactive({
   loginResponse: "",
@@ -13,18 +16,27 @@ const state = reactive({
     permission: "",
   }
 
-});  
+});
 
-const handleLogin = async () => {
+const handleLogin = async (username, password) => {
   const loginDetails = {
-    USERNAME: state.user.username,
-    PASSWORD: state.user.password,
+    USERNAME: username,
+    PASSWORD: password,
   }
   try {
     console.log(loginDetails)
     const response = await axios.post("http://localhost:3000/login", loginDetails);
     console.log(response);
+    console.log(response.data)
+    console.log("asad")
     state.loginResponse = response.data.message
+    const token = response.data.loginToken
+    const user = response.data.user
+    console.log("User data:")
+    console.log(user, token)
+    store.commit("setUser", user);
+    store.commit("setToken", token);
+    localStorage.setItem("token", token);
   } catch(error) {
     state.loginResponse = error.response.data.error;
   } finally {
@@ -33,7 +45,8 @@ const handleLogin = async () => {
       router.push('/')
     } else {
       console.log("pass");
-  }
+    }
+
   }
 
   //export state
@@ -72,7 +85,6 @@ const authenticate = async () => {
     <br />  
     <input type="password" v-model="state.user.password" placeholder="Enter your password" required>
     <br /><br />
-    <button @click="handleLogin">Submit</button>
+    <button @click="handleLogin(state.user.username, state.user.password)">Submit</button>
     <p>{{ state.loginResponse }}</p>
-    <h4>Hello!</h4>
 </template>
