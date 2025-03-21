@@ -4,4 +4,5 @@ import LoginBox from '@/components/LoginBox.vue';
 
 <template>
   <LoginBox />
+  <RouterLink to="/signup">Register now</RouterLink>
 </template>

@@ -17,6 +17,10 @@ const state = reactive({
 });
 
 const handleSignup = async () => {
+  if (state.user.username == "" || state.user.password == "" || state.user.permission == "") {
+    return state.signupResponse = "Missing fields"
+  }
+
   const signupDetails = {
     USERNAME: state.user.username,
     PASSWORD: state.user.password,
@@ -31,6 +35,10 @@ const handleSignup = async () => {
     state.signupResponse = error.response.data;
     console.log(state.signupResponse)
   } finally {
+    if (state.signupResponse.message == null) {
+      return state.signupResponse = "Username already exists"
+    }
+
     if (state.signupResponse.message.slice(0,21) === "Successfully inserted") {
       console.log('Successful signup');
       handleLogin(state.user.username, state.user.password, store)

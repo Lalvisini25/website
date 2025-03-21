@@ -9,7 +9,12 @@ app.use(router);
 
 const store = createStore({
     state: {
-        user: null,
+        user: {
+            id: null,
+            username: null,
+            password: null,
+            permission: null
+        },
         token: null,
     },
     mutations: {
@@ -24,6 +29,9 @@ const store = createStore({
     getters: {
         isLoggedIn(state) {
             return !!state.token
+        },
+        getPermissions(state) {
+            return state.user.permission
         }
     },
 })

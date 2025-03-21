@@ -5,6 +5,7 @@ import LoginView from '@/views/LoginView.vue';
 import AssignmentsView from '@/views/AssignmentsView.vue';
 import ChatView from '@/views/ChatView.vue';
 import SignupView from '@/views/SignupView.vue';
+import AddClassroomView from '@/views/AddClassroomView.vue';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -33,6 +34,11 @@ const router = createRouter({
             path: '/chat',
             name: 'chat',
             component: ChatView,
+        },
+        {
+            path: '/classrooms/add',
+            name: 'addClassroom',
+            component: AddClassroomView,
         },
         {
             path: '/:catchAll(.*)',
