@@ -1,32 +1,13 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { useStore } from 'vuex';
 
-const router = useRouter();
 const route = useRoute();
-const store = useStore();
 const classroom = ref(null);
 const assignments = ref([]);
 
 const classroomId = route.params.id;
-
-const isTeacher = computed(() =>
-  store.getters.getPermissions === "teacher"
-);
-
-const sendAddAssignment = () => {
-  router.push(`/classrooms/addAssignment/${classroomId}`);
-};
-
-const sendAssignments = () => {
-  router.push(`/classrooms/${classroomId}/assignments/`);
-};
-
-const goAssignment = (id) => {
-    router.push(`/classrooms/${classroomId}/assignments/${id}`)
-}
 
 onMounted(async () => {
   try {
@@ -48,29 +29,17 @@ onMounted(async () => {
 
 <template>
     <div v-if="classroom">
-      <h1>{{ classroom.class_name }}</h1>
-      <p>Teacher: {{ classroom.teacher?.username }}</p>
-  
-      <button @click="sendAssignments">View assignments</button>
-      <br />
-      <button v-if="isTeacher">New announcement</button>
-      <br />
-      <button v-if="isTeacher" @click="sendAddAssignment">Add assignments</button>
-  
       <h2>Assignments</h2>
       <ul>
         <li v-for="assignment in assignments" :key="assignment.assignment_id">
             <strong>{{ assignment.task_description }}</strong><br />
             Created: {{ new Date(assignment.creation_date).toLocaleDateString() }}<br />
             Deadline: {{ new Date(assignment.deadline_date).toLocaleString() }}
-            <br />
-            <button @click="goAssignment(assignment.assignment_id)">Open Assignment</button>
             <hr />
         </li>
       </ul>
-
     </div>
-  
+
     <div v-else>
       <p>Loading classroom info...</p>
     </div>
