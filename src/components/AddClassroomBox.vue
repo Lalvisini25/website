@@ -1,27 +1,90 @@
 <script setup>
+import { reactive, onMounted } from 'vue';
+import axios from 'axios';
+import { useStore } from 'vuex';
+import router from '@/router';
+import { LinkedList } from '@/utils/Data Structures/LinkedList';
+
+const store = useStore();
 
 const state = reactive({
-    class_name: "",
-    colour: "#808080"
-})
+  class_name: "",
+  colour: "#808080",
+  students: new LinkedList(),
+  classStudents: new LinkedList(),
+  addClassroomResponse: ""
+});
 
+const addStudent = (student) => {
+  state.classStudents.insertAtTail(student);
+  console.log(state.students.removeStudent(student.userId));
+};
+
+const removeStudent = (student) => {
+  state.students.insertAtTail(student);
+  console.log(state.classStudents.removeStudent(student));
+};
+
+const handleAdd = async () => {
+  const details = {
+    PERMISSIONS: store.getters.getPermissions,
+    ID: store.getters.getId,
+    NAME: state.class_name,
+    COLOUR: state.colour,
+    STUDENTS: state.classStudents.array() // convert LinkedList to array
+  };
+
+  try {
+    const response = await axios.post("http://localhost:3000/classrooms/add", details);
+    router.push(`/classrooms/${response.data.class_id}`);
+  } catch (error) {
+    console.error("Error creating classroom:", error);
+    state.addClassroomResponse = error.response?.data?.error || "An unknown error occurred.";
+  }
+};
+
+// ✅ Fetch students from backend
+onMounted(async () => {
+  try {
+    const response = await axios.get("http://localhost:3000/students/get");
+    response.data.forEach(student => state.students.insertAtTail(student));
+  } catch (error) {
+    console.error('Error fetching students:', error);
+  }
+});
 </script>
 
 <template>
-    <h2>Add classroom:</h2>
-    <input type="text" v-model="state.class_name" placeholder="Enter class name" required>
-    <br />  
-    <label for="colour-picker">Choose a color:</label>
-    <input type="color" id="colour-picker" v-model="state.colour">
-    <br />  
+  <h2>Add Classroom</h2>
 
+  <input type="text" v-model="state.class_name" placeholder="Enter class name" required />
+  <br />
 
-    <label for="pet-select">Choose your role:</label>
+  <label for="colour-picker">Choose a color:</label>
+  <input type="color" id="colour-picker" v-model="state.colour" />
+  <br />
 
-    <select v-model="state.user.permission" name="permissions" id="permission-select" required>
-      <option value="">Select</option>
-      <option value="student">Student</option>
-      <option value="teacher">Teacher</option>
-      <option value="admin">Admin</option>
-    </select>
+  <p>Selected Color: {{ state.colour }}</p>
+
+  <h3>Available Students</h3>
+  <ul>
+    <li v-for="student in state.students.array()" :key="student.student_id">
+      {{ student.username }}
+      <button @click="addStudent(student)">+</button>
+    </li>
+  </ul>
+
+  <h3>Students in {{ state.class_name || 'class' }}</h3>
+  <ul>
+    <li v-for="student in state.classStudents.array()" :key="student.student_id">
+      {{ student.username }}
+      <button @click="removeStudent(student)">-</button>
+    </li>
+  </ul>
+
+  <button :disabled="!state.class_name" @click="handleAdd()">Create</button>
+
+  <p v-if="state.addClassroomResponse" style="color: red;">
+    {{ state.addClassroomResponse }}
+  </p>
 </template>

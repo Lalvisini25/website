@@ -32,6 +32,9 @@ const store = createStore({
         },
         getPermissions(state) {
             return state.user.permission
+        },
+        getId(state) {
+            return state.user.id
         }
     },
 })

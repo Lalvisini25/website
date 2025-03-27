@@ -31,13 +31,13 @@ const handleSignup = async () => {
     console.log(response);
     state.signupResponse = response.data;
     console.log(state.signupResponse.message)
+    if (state.signupResponse.message == null) {
+      return state.signupResponse = "Username already exists"
+    }
   } catch(error) {
     state.signupResponse = error.response.data;
     console.log(state.signupResponse)
   } finally {
-    if (state.signupResponse.message == null) {
-      return state.signupResponse = "Username already exists"
-    }
 
     if (state.signupResponse.message.slice(0,21) === "Successfully inserted") {
       console.log('Successful signup');
