@@ -1,0 +1,52 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import axios from 'axios';
+import BackButton from '@/components/BackButton.vue';
+
+const route = useRoute();
+const assignmentId = route.params.assignment_id;
+const classId = route.params.class_id;
+const resources = ref([]);
+const loading = ref(true);
+
+console.log(classId)
+
+onMounted(async () => {
+  try {
+    const response = await axios.get("http://localhost:3000/assignments/get/resources", {
+      params: { ASSIGNMENT_ID: assignmentId }
+    });
+    resources.value = response.data;
+  } catch (error) {
+    console.error("Failed to load resources:", error);
+  } finally {
+    loading.value = false;
+  }
+});
+</script>
+
+<template>
+  <div>
+    <h2>Resources for Assignment</h2>
+
+    <div v-if="loading">
+      Loading resources...
+    </div>
+
+    <ul v-else-if="resources.length > 0">
+      <li v-for="resource in resources" :key="resource.resource_link">
+        <a :href="`http://localhost:3000${resource.resource_link}`" target="_blank" rel="noopener noreferrer">
+          {{ resource.original_name || resource.resource_link.split('/').pop() }}
+        </a>
+      </li>
+    </ul>
+
+    <div v-else>
+      <p>No resources found for this assignment.</p>
+    </div>
+
+    <br />
+    <BackButton />
+  </div>
+</template>

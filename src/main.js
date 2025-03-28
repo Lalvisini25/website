@@ -7,7 +7,7 @@ const app = createApp(App);
 
 app.use(router);
 
-const store = createStore({
+export const store = createStore({
     state: {
         user: {
             id: null,

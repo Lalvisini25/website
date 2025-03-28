@@ -74,10 +74,7 @@ onMounted(async () => {
   <button v-if="!store.getters.isLoggedIn" @click="sendLogin">Login</button>
   <button v-if="!store.getters.isLoggedIn" @click="sendSignup">Signup</button>
 
-  <h1 v-else>Logged in</h1>
-  <p>{{ store.getters.getPermissions }}</p>
-
-  <button v-if="isTeacherOrAdmin" @click="pushAddClassroom">Add classroom</button>
+  <h1 v-else>Classes</h1>
 
   <div v-if="classes.length > 0 && store.getters.isLoggedIn">
     <div v-for="classroom in classes" :key="classroom.class_id">
@@ -92,4 +89,8 @@ onMounted(async () => {
   <div v-else-if="store.getters.isLoggedIn">
     <p>No classrooms found.</p>
   </div>
+  
+  <br />
+
+  <button v-if="isTeacherOrAdmin" @click="pushAddClassroom">Add classroom</button>
 </template>

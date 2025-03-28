@@ -8,8 +8,13 @@ import SignupView from '@/views/SignupView.vue';
 import AddClassroomView from '@/views/AddClassroomView.vue';
 import ClassroomView from '@/views/ClassroomView.vue';
 import AddAssignmentView from '@/views/AddAssignmentView.vue';
-import AssignmentView from '@/views/AssignmentView.vue';
+import StudentAssignmentView from '@/views/StudentAssignmentView.vue';
 import ClassAssignmentsView from '@/views/ClassAssignmentsView.vue';
+import AddAnnouncementView from '@/views/AddAnnouncementView.vue';
+import TeacherAssignmentView from '@/views/TeacherAssignmentView.vue';
+import { store } from '@/main.js';
+import SubmissionView from '@/views/SubmissionView.vue';
+import ResourcesView from '@/views/ResourcesView.vue';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -52,17 +57,39 @@ const router = createRouter({
         {
             path: '/classrooms/:class_id/assignments/:assignment_id',
             name: 'assignment',
-            component: AssignmentView,
-        },
+            component: StudentAssignmentView, // default
+            beforeEnter: (to, from, next) => {
+              const role = store.getters.getPermissions;
+              if (role === 'teacher') {
+                to.matched[0].components.default = TeacherAssignmentView;
+              }
+              next();
+            }
+        },   
         {
             path: '/classrooms/:class_id/assignments',
             name: 'class-assignments',
             component: ClassAssignmentsView,
         },
         {
-            path: '/classrooms/addAssignment/:id',
+            path: '/classrooms/:class_id/addAssignment',
             name: 'add-assignment',
             component: AddAssignmentView,
+        },
+        {
+            path: '/classrooms/:class_id/addAnnouncement',
+            name: 'add-announcement',
+            component: AddAnnouncementView,
+        },
+        {
+            path: '/classrooms/:class_id/assignments/:assignment_id/submission/:submission_id',
+            name: 'submission',
+            component: SubmissionView,
+        },
+        {
+            path: '/classrooms/:class_id/assignments/:assignment_id/resources',
+            name: 'resources',
+            component: ResourcesView
         },
         {
             path: '/:catchAll(.*)',

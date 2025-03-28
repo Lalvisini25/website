@@ -2,41 +2,51 @@
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import BackButton from '@/components/BackButton.vue';
 
 const route = useRoute();
 const router = useRouter();
-const classroomId = route.params.id;
+const classroomId = route.params.class_id;
 
 const title = ref('');
 const description = ref('');
 const deadline = ref('');
-const downloadInput = ref('');
 const downloads = ref([]);
+const resourceFile = ref(null);
 
-const addDownload = () => {
-  if (downloadInput.value.trim()) {
-    downloads.value.push(downloadInput.value.trim());
-    downloadInput.value = '';
+const paperType = ref('none');
+
+const handleFileSelection = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    resourceFile.value = file;
   }
-};
-
-const removeDownload = (index) => {
-  downloads.value.splice(index, 1);
 };
 
 const submitAssignment = async () => {
   try {
-    const response = await axios.post("http://localhost:3000/assignments/add", {
+    const assignmentPayload = {
       class_id: classroomId,
       deadline_date: deadline.value,
-      task_description: `${title.value}\n\n${description.value}`
-    });
-    console.log(response)
-    alert("Assignment added!");
+      task_description: `${title.value}\n\n${description.value}`,
+      paper_type: paperType.value,
+      downloads: downloads.value
+    };
+
+    const response = await axios.post("http://localhost:3000/assignments/add", assignmentPayload);
+    const assignmentId = response.data.assignment_id;
+
+    if (resourceFile.value) {
+      const formData = new FormData();
+      formData.append("file", resourceFile.value);
+      formData.append("assignment_id", assignmentId);
+
+      await axios.post("http://localhost:3000/resources/upload", formData);
+    }
+
     router.push(`/classrooms/${classroomId}`);
   } catch (error) {
     console.error("Error submitting assignment:", error);
-    alert("Failed to add assignment");
   }
 };
 </script>
@@ -50,22 +60,21 @@ const submitAssignment = async () => {
   <p>Description</p>
   <textarea v-model="description" rows="4" cols="50"></textarea>
 
-  <p>Downloads</p>
-  <div v-for="(file, index) in downloads" :key="index">
-    <span>{{ file }}</span>
-    <button @click="removeDownload(index)">X</button>
-  </div>
-  <input
-    v-model="downloadInput"
-    @keyup.enter="addDownload"
-    type="text"
-    placeholder="Add download"
-  />
-  <button @click="addDownload">Add download</button>
+  <p>Paper Type:</p>
+  <select v-model="paperType">
+    <option value="none">None</option>
+    <option value="paper 1">Paper 1</option>
+    <option value="paper 2">Paper 2</option>
+  </select>
+
+  <p>Attach a file (optional):</p>
+  <input type="file" @change="handleFileSelection" />
 
   <p>Deadline</p>
   <input v-model="deadline" type="datetime-local" />
 
   <br /><br />
   <button @click="submitAssignment">Submit</button>
+  <br /><br />
+  <BackButton />
 </template>

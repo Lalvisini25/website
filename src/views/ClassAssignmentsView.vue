@@ -1,13 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import BackButton from '@/components/BackButton.vue';
 
+const router = useRouter()
 const route = useRoute();
 const classroom = ref(null);
 const assignments = ref([]);
 
-const classroomId = route.params.id;
+const classroomId = route.params.class_id;
+
+const goAssignment = (id) => {
+    router.push(`/classrooms/${classroomId}/assignments/${id}`)
+}
 
 onMounted(async () => {
   try {
@@ -29,18 +35,21 @@ onMounted(async () => {
 
 <template>
     <div v-if="classroom">
-      <h2>Assignments</h2>
-      <ul>
-        <li v-for="assignment in assignments" :key="assignment.assignment_id">
-            <strong>{{ assignment.task_description }}</strong><br />
-            Created: {{ new Date(assignment.creation_date).toLocaleDateString() }}<br />
-            Deadline: {{ new Date(assignment.deadline_date).toLocaleString() }}
-            <hr />
-        </li>
-      </ul>
+        <h2>Assignments</h2>
+        <ul>
+            <li v-for="assignment in assignments" :key="assignment.assignment_id">
+                <strong>{{ assignment.task_description }}</strong><br />
+                Created: {{ new Date(assignment.creation_date).toLocaleDateString() }}<br />
+                Deadline: {{ new Date(assignment.deadline_date).toLocaleString() }}
+                <br />
+                <button @click="goAssignment(assignment.assignment_id)">Open Assignment</button>
+                <hr />
+            </li>
+        </ul>
     </div>
 
     <div v-else>
-      <p>Loading classroom info...</p>
+        <p>Loading classroom info...</p>
     </div>
-  </template>  
+    <BackButton />
+</template>  

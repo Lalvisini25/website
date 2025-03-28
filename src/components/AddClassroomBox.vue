@@ -17,12 +17,16 @@ const state = reactive({
 
 const addStudent = (student) => {
   state.classStudents.insertAtTail(student);
-  console.log(state.students.removeStudent(student.userId));
+  if (state.students.contains(student)) {
+    state.students.remove(student);
+  }
 };
 
 const removeStudent = (student) => {
   state.students.insertAtTail(student);
-  console.log(state.classStudents.removeStudent(student));
+  if (state.classStudents.contains(student)) {
+    state.classStudents.remove(student);
+  }
 };
 
 const handleAdd = async () => {
@@ -31,7 +35,7 @@ const handleAdd = async () => {
     ID: store.getters.getId,
     NAME: state.class_name,
     COLOUR: state.colour,
-    STUDENTS: state.classStudents.array() // convert LinkedList to array
+    STUDENTS: state.classStudents.array()
   };
 
   try {
@@ -43,7 +47,6 @@ const handleAdd = async () => {
   }
 };
 
-// ✅ Fetch students from backend
 onMounted(async () => {
   try {
     const response = await axios.get("http://localhost:3000/students/get");
@@ -58,15 +61,14 @@ onMounted(async () => {
   <h2>Add Classroom</h2>
 
   <input type="text" v-model="state.class_name" placeholder="Enter class name" required />
-  <br />
+  <br /><br />
+
 
   <label for="colour-picker">Choose a color:</label>
   <input type="color" id="colour-picker" v-model="state.colour" />
   <br />
 
-  <p>Selected Color: {{ state.colour }}</p>
-
-  <h3>Available Students</h3>
+  <h3>Available Students ({{ state.students.size() }})</h3>
   <ul>
     <li v-for="student in state.students.array()" :key="student.student_id">
       {{ student.username }}
@@ -74,7 +76,8 @@ onMounted(async () => {
     </li>
   </ul>
 
-  <h3>Students in {{ state.class_name || 'class' }}</h3>
+  <h3>Students in class: {{ state.class_name }} ({{ state.classStudents.size() }}) </h3>
+
   <ul>
     <li v-for="student in state.classStudents.array()" :key="student.student_id">
       {{ student.username }}

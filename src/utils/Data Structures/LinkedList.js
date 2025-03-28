@@ -242,33 +242,34 @@ export class LinkedList {
         return result;
     }
 
-    removeStudent(id) {
+    remove(data) {
         if (this.isEmpty()) {
             return "List is empty";
         }
+        if (data === this.first() && this.length == 1) {
+            this.head = null;
+            this.tail = null;
+            this.length -= 1;
+            return "Item removed";
+        } else if (data === this.first()) {
+            this.head = this.head.next;
+            this.head.prev = null;
+            this.length -= 1;
+            return "Item removed";
+        } else if (data === this.last()) {
+            this.tail = this.tail.prev;
+            this.tail.next = null;
+            this.length -= 1;
+            return "Item removed";
+        }
 
         let iterator = this.head;
-        let temp = []
-
         while (iterator != null) {
-            temp.push(iterator)
-            if (iterator.data.user_id === id) {
-                temp.push("a")
-                temp.push(iterator)
-                if (iterator.prev != null) {
-                    iterator.prev.next = iterator.next;
-                } else {
-                    this.head = iterator.next;
-                }
-
-                if (iterator.next != null) {
-                    iterator.next.prev = iterator.prev;
-                } else {
-                    this.tail = iterator.prev;
-                }
-
+            if (iterator.data === data) {
+                iterator.next.prev = iterator.prev;
+                iterator.prev.next = iterator.next;
                 this.length -= 1;
-                return "User removed";
+                return "Item removed";
             }
             iterator = iterator.next;
         }
