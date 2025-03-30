@@ -1,4 +1,5 @@
 <script setup>
+// This component renders a navigation bar with links to the home page and the chat page.
 import { RouterLink } from 'vue-router';
 </script>
 

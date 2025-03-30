@@ -4,79 +4,55 @@ import { reactive } from "vue";
 import router from "@/router";
 import { useStore } from "vuex";
 
-//Creates user object
-
 const store = useStore();
-
+// State object that stores the response from the server after a login attempt
+// as well as the username, password, and permission of the user
 const state = reactive({
+  // Response from the server
   loginResponse: "",
+  // User data
   user: {
+    // Username of the user
     username: "",
+    // Password of the user
     password: "",
+    // Permission level of the user
     permission: "",
   }
-
-});
-
+})
 const handleLogin = async (username, password) => {
+  // Create an object with the username and password submitted by the user
   const loginDetails = {
     USERNAME: username,
-    PASSWORD: password,
+    PASSWORD: password
   }
   try {
-    console.log(loginDetails)
-    const response = await axios.post("http://localhost:3000/login", loginDetails);
-    console.log(response);
-    console.log(response.data)
-    console.log("asad")
+    // Send a POST request to the server with the login details
+    const response = await axios.post("http://localhost:3000/login", loginDetails)
+    // Set the login response in the state
     state.loginResponse = response.data.message
-    const token = response.data.loginToken
+    // Extract the user and the login token from the response
     const user = response.data.user
-    console.log("User data:")
-    console.log(user, token)
-    store.commit("setUser", user);
-    store.commit("setToken", token);
-    localStorage.setItem("token", token);
-  } catch(error) {
-    state.loginResponse = error.response.data.error;
+    const token = response.data.loginToken
+    // Commit the user and token to the Vuex store
+    store.commit("setUser", user)
+    store.commit("setToken", token)
+    // Store the token in local storage
+    localStorage.setItem("token", token)
+  } catch (error) {
+    // Set the login response with the error message
+    state.loginResponse = error.response.data.error
   } finally {
+    // Check if the login was successful
     if (state.loginResponse === "Login successful") {
-      console.log('Successful login');
+      // If it was, redirect to the homepage
       router.push('/')
     } else {
-      console.log("pass");
+      // If not, do nothing
+      console.log("pass")
     }
-
-  }
-
-  //export state
-}
-
-/*
-const signup = async () => {
-  fetch("http://localhost:3000/signup", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      USERNAME: this.username,
-      PASSWORD: this.password,
-      PERMISSIONS: this.permission
-    })
-  })
-}
-*/
-/*
-const authenticate = async () => {
-  try {
-    const response = await axios.get(`http://localhost:3000/token?username=${username}`);
-    this.loginResponse = response.data;
-  } catch(error) {
-    this.loginResponse = error.response.data;
   }
 }
-*/
 </script>
 
 <template>

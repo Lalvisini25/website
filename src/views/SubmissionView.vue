@@ -4,89 +4,118 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import BackButton from '@/components/BackButton.vue';
 
-const router = useRouter();
-const route = useRoute();
-const submissionId = route.params.submission_id;
+const router = useRouter()
+const route = useRoute()
+const submissionId = route.params.submission_id
 
-const submission = ref(null);
-const loading = ref(true);
-const grade = ref(null);
-const feedback = ref('');
-const paperType = ref('none');
-const criteriaGrades = ref({ A: null, B: null, C: null, D: null });
-const improvementNotes = ref(''); // 🆕 input from teacher
+// Submission reactive reference. Stores the submission data from the database
+const submission = ref(null)
+// Loading flag. Set to true while the submission is being loaded
+const loading = ref(true)
+// Grade reactive reference. Stores the grade of the submission
+const grade = ref(null)
+// Feedback reactive reference. Stores the feedback for the submission
+const feedback = ref('')
+// Paper type reactive reference. Stores the type of paper
+const paperType = ref('none')
+// Criteria grades reactive reference. Stores the grades for each criteria
+const criteriaGrades = ref({ A: null, B: null, C: null, D: null })
+// Improvement notes reactive reference. Stores the improvement notes for the student
+const improvementNotes = ref('')
 
 const calculateTotalGrade = () => {
+  // Calculates the total grade based on the paper type and grades
+  // If the paper type is paper 1 or paper 2, it adds the grades for each criteria
+  // If the paper type is not paper 1 or paper 2, it returns the grade
   if (paperType.value === 'paper 1' || paperType.value === 'paper 2') {
     return (
       (criteriaGrades.value.A || 0) +
       (criteriaGrades.value.B || 0) +
       (criteriaGrades.value.C || 0) +
       (criteriaGrades.value.D || 0)
-    );
+    )
   }
-  return grade.value;
-};
+  return grade.value
+}
 
 const generateFeedback = async () => {
   try {
-    const res = await axios.post('http://localhost:3000/feedback/generate', {
-      paper_type: paperType.value,
-      criteria: criteriaGrades.value,
-      improvement_notes: improvementNotes.value // 🆕 send to backend
-    });
-    feedback.value = res.data.feedback;
+    // Post request to generate feedback endpoint
+    // Pass in paper type, criteria grades and improvement notes
+    const res = await axios.post('http://localhost:3000/feedback/generate'
+      , { paper_type: paperType.value
+        , criteria: criteriaGrades.value
+        , improvement_notes: improvementNotes.value
+        }
+    )
+    // Set the feedback text to the response
+    feedback.value = res.data.feedback
   } catch (err) {
-    console.error("Failed to generate feedback:", err);
+    console.error("Failed to generate feedback:", err)
   }
-};
+}
 
 const submitGrade = async () => {
   try {
+    // Create a new object with the submission_id, grade and feedback
+    // and remove any other properties
     const cleanSubmission = {
       submission_id: submission.value.submission_id,
       grade: calculateTotalGrade(),
       feedback: feedback.value
     };
+
+    // POST request to the grade endpoint
+    // with the cleanSubmission object
     await axios.post("http://localhost:3000/submissions/grade", cleanSubmission);
+
+    // Go back to the previous page
     router.back();
   } catch (error) {
     console.error('Error submitting grade/feedback:', error);
   }
-};
+}
 
 onMounted(async () => {
   try {
+    // Fetch the submission from the database
     const response = await axios.get('http://localhost:3000/submissions/get/single', {
       params: { SUBMISSION_ID: submissionId }
-    });
-    submission.value = response.data;
-    grade.value = submission.value.grade;
-    feedback.value = submission.value.feedback;
+    })
+    submission.value = response.data
+    grade.value = submission.value.grade
+    feedback.value = submission.value.feedback
 
+    // Fetch the assignment from the database
     const assignmentRes = await axios.get('http://localhost:3000/assignments/get', {
       params: {
         CLASS_ID: submission.value.class_id,
         ASSIGNMENT_ID: submission.value.assignment_id
       }
-    });
-    paperType.value = assignmentRes.data.paper_type;
+    })
+    paperType.value = assignmentRes.data.paper_type
 
+    // If the paper type is not none and the grade is not null
+    // then calculate the criteria grades
     if (paperType.value !== 'none' && submission.value.grade !== null) {
-      const total = submission.value.grade;
+      // Total grade
+      const total = submission.value.grade
+      // If the paper type is paper 1
       if (paperType.value === 'paper 1') {
-        criteriaGrades.value.A = criteriaGrades.value.B = criteriaGrades.value.C = criteriaGrades.value.D = Math.min(5, Math.floor(total / 4));
+        // Set the criteria grades to the minimum of 5 or the total grade divided by 4
+        criteriaGrades.value.A = criteriaGrades.value.B = criteriaGrades.value.C = criteriaGrades.value.D = Math.min(5, Math.floor(total / 4))
       } else if (paperType.value === 'paper 2') {
-        criteriaGrades.value.A = criteriaGrades.value.B = Math.min(10, Math.floor(total / 4));
-        criteriaGrades.value.C = criteriaGrades.value.D = Math.min(5, Math.floor(total / 4));
+        // Set the criteria grades to the minimum of 10 or the total grade divided by 4
+        criteriaGrades.value.A = criteriaGrades.value.B = Math.min(10, Math.floor(total / 4))
+        criteriaGrades.value.C = criteriaGrades.value.D = Math.min(5, Math.floor(total / 4))
       }
     }
   } catch (error) {
-    console.error("Error fetching submission or assignment:", error);
+    console.error("Error fetching submission or assignment:", error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+})
 </script>
 
 <template>
@@ -145,7 +174,7 @@ onMounted(async () => {
         <br />
         <button @click="generateFeedback">Generate AI Feedback</button>
         <br /><br />
-        <textarea v-model="feedback" placeholder="Feedback" rows="30" cols="150"></textarea>
+        <textarea v-model="feedback" placeholder="Feedback" rows="20" cols="150"></textarea>
         <br />
         <button @click="submitGrade">Complete</button>
       </div>

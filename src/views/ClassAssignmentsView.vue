@@ -5,32 +5,38 @@ import axios from 'axios';
 import BackButton from '@/components/BackButton.vue';
 
 const router = useRouter()
-const route = useRoute();
-const classroom = ref(null);
-const assignments = ref([]);
+const route = useRoute()
+const classroom = ref(null)
+const assignments = ref([])
 
 const classroomId = route.params.class_id;
 
+// Navigate to the assignment page with the given id
 const goAssignment = (id) => {
     router.push(`/classrooms/${classroomId}/assignments/${id}`)
 }
 
 onMounted(async () => {
   try {
+    // Get the classroom info from the server
     const classRes = await axios.get("http://localhost:3000/classrooms/get/classInfo", {
       params: { ID: classroomId }
-    });
-    classroom.value = classRes.data;
+    })
+    // Store the classroom data in the reactive reference
+    classroom.value = classRes.data
 
+    // Get the assignments for the classroom from the server
     const assignmentRes = await axios.get("http://localhost:3000/assignments/get/class", {
       params: { ID: classroomId }
-    });
-    assignments.value = assignmentRes.data;
+    })
+    // Store the assignments in the reactive reference
+    assignments.value = assignmentRes.data
 
   } catch (error) {
-    console.log("Error loading classroom or assignments:", error);
+    // Log any errors to the console
+    console.log("Error loading classroom or assignments:", error)
   }
-});
+})
 </script>
 
 <template>

@@ -4,26 +4,31 @@ import { useRoute } from 'vue-router';
 import axios from 'axios';
 import BackButton from '@/components/BackButton.vue';
 
-const route = useRoute();
+const route = useRoute()
 const assignmentId = route.params.assignment_id;
 const classId = route.params.class_id;
-const resources = ref([]);
-const loading = ref(true);
+const resources = ref([])
+const loading = ref(true)
 
 console.log(classId)
 
 onMounted(async () => {
   try {
+    // Make a GET request to the server to get the resources for the assignment
+    // with the given assignment ID
     const response = await axios.get("http://localhost:3000/assignments/get/resources", {
       params: { ASSIGNMENT_ID: assignmentId }
-    });
-    resources.value = response.data;
+    })
+    // Store the resources in the reactive reference
+    resources.value = response.data
   } catch (error) {
-    console.error("Failed to load resources:", error);
+    // Log any errors to the console
+    console.error("Failed to load resources:", error)
   } finally {
-    loading.value = false;
+    // Set the loading flag to false
+    loading.value = false
   }
-});
+})
 </script>
 
 <template>

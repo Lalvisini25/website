@@ -8,47 +8,61 @@ const route = useRoute();
 const router = useRouter();
 const classroomId = route.params.class_id;
 
+// Title of the assignment
 const title = ref('');
+// Description of the assignment
 const description = ref('');
+// Deadline of the assignment
 const deadline = ref('');
+// Array of resource download links
 const downloads = ref([]);
+// File to be uploaded as a resource
 const resourceFile = ref(null);
 
+// Default paper type
 const paperType = ref('none');
 
-const handleFileSelection = (event) => {
-  const file = event.target.files[0];
+// Handle file selection event
+// Get the first file from the event target
+// If a file is selected, set the resourceFile reactive reference to the file
+const handleFileSelection = event => {
+  const file = event.target.files[0]
   if (file) {
-    resourceFile.value = file;
+    resourceFile.value = file
   }
-};
+}
 
 const submitAssignment = async () => {
   try {
+    // Create the payload for the assignment
     const assignmentPayload = {
       class_id: classroomId,
       deadline_date: deadline.value,
       task_description: `${title.value}\n\n${description.value}`,
       paper_type: paperType.value,
       downloads: downloads.value
-    };
-
-    const response = await axios.post("http://localhost:3000/assignments/add", assignmentPayload);
-    const assignmentId = response.data.assignment_id;
-
-    if (resourceFile.value) {
-      const formData = new FormData();
-      formData.append("file", resourceFile.value);
-      formData.append("assignment_id", assignmentId);
-
-      await axios.post("http://localhost:3000/resources/upload", formData);
     }
 
-    router.push(`/classrooms/${classroomId}`);
+    // Send a POST request to add the assignment
+    const response = await axios.post("http://localhost:3000/assignments/add", assignmentPayload)
+    const assignmentId = response.data.assignment_id
+
+    // If a resource file is selected, upload it
+    if (resourceFile.value) {
+      const formData = new FormData()
+      formData.append("file", resourceFile.value)
+      formData.append("assignment_id", assignmentId)
+
+      await axios.post("http://localhost:3000/resources/upload", formData)
+    }
+
+    // Redirect to the classroom page
+    router.push(`/classrooms/${classroomId}`)
   } catch (error) {
-    console.error("Error submitting assignment:", error);
+    // Log any errors that occur during the process
+    console.error("Error submitting assignment:", error)
   }
-};
+}
 </script>
 
 <template>

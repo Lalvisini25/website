@@ -3,27 +3,33 @@ import { defineProps } from 'vue';
 import router from '@/router';
 
 const props = defineProps({
+  // The name of the classroom
   name: {
     type: String,
-    default: 'Unnamed Class',
+    default: 'Unnamed Class'
   },
+  // The teacher of the classroom
   teacher: {
     type: Object,
-    default: () => ({ username: 'Unknown Teacher' }),
+    default: () => ({ username: 'Unknown Teacher' })
   },
+  // The hex color of the header
   headerColour: {
     type: String,
-    default: 'gray',
+    default: '#808080'
   },
+  // The id of the classroom
   id: {
     type: Number,
-    default: 4,
+    default: 4
   }
-});
+})
 
+// Go to the classroom page with the given id
 const goClassroom = () => {
-  router.push(`/classrooms/${props.id}`);
-};
+  // Push the route to the classroom page
+  router.push(`/classrooms/${props.id}`)
+}
 </script>
 
 

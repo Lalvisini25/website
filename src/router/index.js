@@ -15,88 +15,102 @@ import TeacherAssignmentView from '@/views/TeacherAssignmentView.vue';
 import { store } from '@/main.js';
 import SubmissionView from '@/views/SubmissionView.vue';
 import ResourcesView from '@/views/ResourcesView.vue';
-
 const router = createRouter({
     history: createWebHistory(),
     routes: [
+        // Login page
         {
             path: '/login',
             name: 'login',
-            component: LoginView,
+            component: LoginView
         },
+        // Signup page
         {
             path: '/signup',
             name: 'signup',
-            component: SignupView,
+            component: SignupView
         },
+        // Default page
         {
             path: '/',
             name: 'home',
-            component: HomeView,
+            component: HomeView
         },
+        // Assignments page
         {
             path: '/assignments',
             name: 'assignments',
-            component: AssignmentsView,
+            component: AssignmentsView
         },
+        // Chat page
         {
             path: '/chat',
             name: 'chat',
-            component: ChatView,
+            component: ChatView
         },
+        // Add classroom page
         {
             path: '/classrooms/add',
             name: 'add-classroom',
-            component: AddClassroomView,
+            component: AddClassroomView
         },
+        // Individual classroom page
         {
             path: '/classrooms/:id',
             name: 'classroom',
-            component: ClassroomView,
+            component: ClassroomView
         },
+        // Individual assignment page
         {
             path: '/classrooms/:class_id/assignments/:assignment_id',
             name: 'assignment',
-            component: StudentAssignmentView, // default
+            component: StudentAssignmentView,
+            // Gets user permissions from store to determine which view to use depending on the user permission
             beforeEnter: (to, from, next) => {
-              const role = store.getters.getPermissions;
+              const role = store.getters.getPermissions
               if (role === 'teacher') {
-                to.matched[0].components.default = TeacherAssignmentView;
+                to.matched[0].components.default = TeacherAssignmentView
               }
-              next();
+              next()
             }
         },   
+        // Page showing all assignments for a classroom
         {
             path: '/classrooms/:class_id/assignments',
             name: 'class-assignments',
-            component: ClassAssignmentsView,
+            component: ClassAssignmentsView
         },
+        // Add assignment page
         {
             path: '/classrooms/:class_id/addAssignment',
             name: 'add-assignment',
-            component: AddAssignmentView,
+            component: AddAssignmentView
         },
+        // Add announcement page
         {
             path: '/classrooms/:class_id/addAnnouncement',
             name: 'add-announcement',
-            component: AddAnnouncementView,
+            component: AddAnnouncementView
         },
+        // Submission page
         {
             path: '/classrooms/:class_id/assignments/:assignment_id/submission/:submission_id',
             name: 'submission',
-            component: SubmissionView,
+            component: SubmissionView
         },
+        // Resources page
         {
             path: '/classrooms/:class_id/assignments/:assignment_id/resources',
             name: 'resources',
             component: ResourcesView
         },
+        // 404 page
         {
             path: '/:catchAll(.*)',
             name: 'not-found',
-            component: NotFoundView,
+            component: NotFoundView
         }
     ]
 })
 
-export default router
+export default router;

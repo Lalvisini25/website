@@ -5,29 +5,35 @@ import axios from 'axios';
 import BackButton from '@/components/BackButton.vue';
 
 const router = useRouter()
-const route = useRoute();
-const classroomId = route.params.class_id;
+const route = useRoute()
+const classroomId = route.params.class_id
 
-const title = ref('');
-const message = ref('');
+// Create refs to hold the title and message of the announcement
+const title = ref('')
+const message = ref('')
 
 const sendAnnouncement = async () => {
   try {
+    // Create the payload object containing the announcement title message and class id
     const payload = {
       title: title.value,
       message: message.value,
       class_id: classroomId
-    };
-
-    const response = await axios.post('http://localhost:3000/announcements/add', payload);
-    console.log('Announcement sent:', response.data);
-    title.value = '';
-    message.value = '';
-    router.back();
+    }
+    // Post the payload to the server
+    const response = await axios.post('http://localhost:3000/announcements/add', payload)
+    // Log the response
+    console.log('Announcement sent:', response.data)
+    // Reset the input fields
+    title.value = ''
+    message.value = ''
+    // Return to the previous page
+    router.back()
   } catch (error) {
-    console.error('Failed to send announcement:', error);
+    // Log the error
+    console.error('Failed to send announcement:', error)
   }
-};
+}
 </script>
 
 <template>

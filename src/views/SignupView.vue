@@ -1,4 +1,5 @@
 <script setup>
+// Loads the SignupBox component
 import SignupBox from '@/components/SignupBox.vue';
 </script>
 

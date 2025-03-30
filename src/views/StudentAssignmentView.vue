@@ -5,95 +5,119 @@ import axios from 'axios';
 import BackButton from '@/components/BackButton.vue';
 import { useStore } from 'vuex';
 
-const route = useRoute();
-const router = useRouter();
-const classId = route.params.class_id;
-const assignmentId = route.params.assignment_id;
+const route = useRoute()
+const router = useRouter()
+// get the class_id and assignment_id from the current route
+const classId = route.params.class_id
+const assignmentId = route.params.assignment_id
 
-const assignment = ref(null);
-const submission = ref(null); // uploaded file
-const existingSubmission = ref(null); // existing submission record
-const fileInput = ref(null);
-const store = useStore();
+// reactive references
+const assignment = ref(null)
+const submission = ref(null)
+const existingSubmission = ref(null)
+const fileInput = ref(null)
+const store = useStore()
 
-const studentId = ref(null);
+// reactive reference to the student_id which will be used to submit the assignment
+const studentId = ref(null)
 
 const fetchStudentId = async () => {
+  // Attempt to fetch the student ID from the server using the user's ID from the store
   try {
     const res = await axios.get("http://localhost:3000/students/get/byUserId", {
       params: { USER_ID: store.getters.getId }
-    });
-    studentId.value = res.data.student_id;
+    })
+    studentId.value = res.data.student_id
   } catch (error) {
-    console.error("Failed to get student_id:", error);
+    // Log an error message if fetching the student ID fails
+    console.error("Failed to get student_id:", error)
   }
-};
+}
 
 const fetchAssignment = async () => {
   try {
+    // Make a GET request to fetch the assignment details
     const response = await axios.get("http://localhost:3000/assignments/get", {
       params: { CLASS_ID: classId, ASSIGNMENT_ID: assignmentId }
-    });
-    assignment.value = response.data;
+    })
+    // Store the fetched assignment data in the reactive reference
+    assignment.value = response.data
   } catch (error) {
-    console.error("Failed to fetch assignment:", error);
+    // Log an error message if fetching the assignment fails
+    console.error("Failed to fetch assignment:", error)
   }
-};
+}
 
 const fetchExistingSubmission = async () => {
   try {
-    await fetchStudentId();
+    // Fetch the student ID
+    await fetchStudentId()
+    // Make a GET request to fetch the existing submission
     const res = await axios.get('http://localhost:3000/submissions/get/student', {
       params: {
         ASSIGNMENT_ID: assignmentId,
         STUDENT_ID: studentId.value
       }
-    });
+    })
+    // If the submission exists, store it in the reactive reference
     if (res.data) {
-      existingSubmission.value = res.data;
+      existingSubmission.value = res.data
     }
   } catch (err) {
-    console.error("Failed to fetch existing submission:", err);
+    // Log an error message if fetching the submission fails
+    console.error("Failed to fetch existing submission:", err)
   }
-};
+}
 
 const handleFileUpload = (event) => {
-  submission.value = event.target.files[0];
-};
+  // Assign the selected file to the submission reactive reference
+  submission.value = event.target.files[0]
+}
 
 const removeSubmission = () => {
-  submission.value = null;
-  fileInput.value.value = ""; // reset input
-};
+  // Clear the submission and reset the file input
+  submission.value = null
+  fileInput.value.value = ""
+}
 
 const submitAssignment = async () => {
-  await fetchStudentId(); // 🛠️ Make sure we actually have studentId before submitting
+  // Fetch the student ID before submitting the assignment
+  await fetchStudentId()
 
+  // Check if the submission and student ID exist before submitting
   if (!submission.value || !studentId.value) {
-    console.error("Missing submission or student ID", { submission: submission.value, studentId: studentId.value });
-    return;
+    console.error("Missing submission or student ID", { submission: submission.value, studentId: studentId.value })
+    return
   }
 
-  const formData = new FormData();
-  formData.append('file', submission.value);
-  formData.append('assignment_id', assignmentId);
-  formData.append('student_id', studentId.value);
+  // Create a FormData object to store the file, assignment ID, and student ID
+  const formData = new FormData()
+  formData.append('file', submission.value)
+  formData.append('assignment_id', assignmentId)
+  formData.append('student_id', studentId.value)
 
+  // Attempt to submit the assignment
   try {
-    const response = await axios.post('http://localhost:3000/assignments/submit', formData);
-    console.log("Submission success:", response.data);
-    await fetchExistingSubmission();
-    submission.value = null;
-    router.back();
+    const response = await axios.post('http://localhost:3000/assignments/submit', formData)
+    console.log("Submission success:", response.data)
+    // Refetch the existing submission so that the UI can update
+    await fetchExistingSubmission()
+    // Reset the submission so that the file input can be reused
+    submission.value = null
+    // Go back to the previous route
+    router.back()
   } catch (error) {
-    console.error("Submission failed:", error.response?.data || error.message);
+    console.error("Submission failed:", error.response?.data || error.message)
   }
-};
+}
 
 onMounted(async () => {
-  await fetchAssignment();
-  await fetchExistingSubmission();
-});
+  // Fetch the assignment data from the server
+  await fetchAssignment()
+
+  // Fetch the existing submission from the server (if any)
+  await fetchExistingSubmission()
+})
 </script>
 
 <template>

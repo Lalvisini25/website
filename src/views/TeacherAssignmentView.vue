@@ -4,42 +4,55 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import BackButton from '@/components/BackButton.vue';
 
-const route = useRoute();
-const router = useRouter();
-const classId = route.params.class_id;
-const assignmentId = route.params.assignment_id;
+// Initialize route and router for navigation and accessing route parameters
+const route = useRoute()
+const router = useRouter()
 
-const submissions = ref([]);
-const loading = ref(true);
-const assignment = ref(null);
+// Get class_id and assignment_id from the current route
+const classId = route.params.class_id
+const assignmentId = route.params.assignment_id
 
+// Reactive reference to store submissions and loading state
+const submissions = ref([])
+// Reactive reference to indicate loading status
+const loading = ref(true)
+// Reactive reference to store assignment data
+const assignment = ref(null)
+
+// Navigate to the submission view with the given submission ID
 const goToSubmission = (submissionId) => {
-  router.push(`${assignmentId}/submission/${submissionId}`);
-};
+  router.push(`${assignmentId}/submission/${submissionId}`)
+}
 
 onMounted(async () => {
   try {
+    // Fetch the assignment with the given assignment ID and class ID
     const assignmentRes = await axios.get("http://localhost:3000/assignments/get", {
       params: {
         CLASS_ID: classId,
         ASSIGNMENT_ID: assignmentId
       }
-    });
-    assignment.value = assignmentRes.data;
+    })
+    // Store the fetched assignment data in the reactive reference
+    assignment.value = assignmentRes.data
 
+    // Fetch all submissions for the given assignment and class
     const res = await axios.get("http://localhost:3000/submissions/get/class", {
       params: {
         CLASS_ID: classId,
         ASSIGNMENT_ID: assignmentId
       }
-    });
-    submissions.value = res.data;
+    })
+    // Store the fetched submissions in the reactive reference
+    submissions.value = res.data
   } catch (error) {
-    console.error("Error loading submissions:", error);
+    // Log an error message if fetching submissions fails
+    console.error("Error loading submissions:", error)
   } finally {
-    loading.value = false;
+    // Set the loading flag to false when done
+    loading.value = false
   }
-});
+})
 </script>
 
 <template>
