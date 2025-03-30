@@ -7,11 +7,15 @@ import jwt from 'jsonwebtoken';
 export const login = (req, res) => {
   // Extract USERNAME and PASSWORD from the request body
   const { USERNAME, PASSWORD } = req.body;
+  console.log(connection)
 
   // Query the database to find a user with the provided username
   connection.query("SELECT * FROM users WHERE username = ?", [USERNAME], (err, results) => {
     // If there is a database error, respond with a 500 status code
-    if (err) return res.status(500).json({ error: "Database error" })
+    if (err) {
+      console.log(err)
+      return res.status(500).json({ error: "Database error" })
+    }
     // If no user is found or the password does not match, respond with a 401 status code
     if (results.length === 0 || results[0].password !== PASSWORD) {
       return res.status(401).json({ error: "Invalid credentials" })

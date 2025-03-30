@@ -11,4 +11,3 @@ router.post('/add', addAnnouncement)
 router.get('/get/class', getClassAnnouncements)
 
 export default router;
-

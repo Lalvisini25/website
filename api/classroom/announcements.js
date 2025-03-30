@@ -33,16 +33,15 @@ export const getClassAnnouncements = (req, res) => {
   const { ID } = req.query;
 
   // Query the database for all announcements for the given class
-  connection.query(
-    "SELECT * FROM announcements WHERE class_id = ? ORDER BY date_created DESC",
-    [ID]
-  )
-  // If there is an error, return a 500 status with a json object describing the error
-  .on('error', err => {
-    return res.status(500).json({ error: "Database error" });
-  })
-  // If the query is successful, return a 200 status with a json object describing the result
-  .on('result', result => {
-    return res.json(result);
+connection.query(
+     "SELECT * FROM announcements WHERE class_id = ? ORDER BY date_created DESC",
+     [ID],
+     (err, result) => {
+       if (err) {
+         console.error("Error fetching announcements:", err);
+         return res.status(500).json({ error: "Database error" })
+       }
+ 
+       return res.json(result);
   });
 }

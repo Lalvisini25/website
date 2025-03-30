@@ -1,4 +1,6 @@
 import mysql from 'mysql';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Establishes a connection to the MySQL database
 // The connection is exported as a constant and can be imported into other files

@@ -1,4 +1,6 @@
 import express from 'express';
+import multer from 'multer';
+
 import { addClassroom } from '../classroom/classroom.js';
 import { getClassrooms } from '../classroom/classroom.js';
 import { getClassInfo } from '../classroom/classroom.js';
@@ -17,7 +19,6 @@ import { getSingleSubmission } from '../classroom/submissions.js';
 import { gradeSubmission } from '../classroom/submissions.js';
 import { getStudentSubmission } from '../classroom/submissions.js';
 import { uploadResource } from '../classroom/classroom.js';
-import multer from 'multer';
 import { generateFeedback } from '../classroom/feedback.js';
 
 const router = express.Router();

@@ -1,7 +1,4 @@
 import { Configuration, OpenAIApi } from "openai";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 // Configuration for the OpenAI API
 // This is used to generate feedback for students
@@ -34,7 +31,8 @@ export const generateFeedback = async (req, res) => {
 
     Briefly comment on each criterion and offer actionable advice based on the student's scoring and the paper type. Avoid generic praise.
 
-    After commenting on each criterion, offer the student some resources to help them improve their score based on their lowest scoring criteria and what they should work on.
+    After commenting on each criterion, offer the student some resources to help them improve their score based on their lowest scoring criteria and what they should 
+    work on.
 
     Speak in the second person directly to the student.
   `

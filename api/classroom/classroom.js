@@ -292,21 +292,21 @@ export const getTeacher = (req, res) => {
 }
 
 export const getTeacherIdFromUser = (req, res) => {
-  // Get user ID from query
-  const user_id = req.query.ID
-
-  // Fetch teacher ID
+  const user_id = req.query.ID;
   connection.query("SELECT teacher_id FROM teachers WHERE user_id = ?", [user_id], (err, result) => {
     if (err) {
-      console.error("Error fetching teacher_id:", err)
-      return res.status(500).json({ error: "Error accessing database" })
+      console.log("Error fetching teacher user_id:", err);
+      return res.status(500).json({ error: "Error accessing database" });
     }
 
     if (result.length === 0) {
-      return res.status(404).json({ error: "Teacher not found" })
+      return res.status(404).json({ error: "Teacher not found" });
     }
 
-    return res.json({ teacher_id: result[0].teacher_id })
+    const teacher_id = result[0];
+
+    return res.json({ teacher_id: teacher_id });
   })
 }
+
 

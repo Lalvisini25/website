@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { store } from '@/main.js';
+
 import HomeView from '@/views/HomeView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
 import LoginView from '@/views/LoginView.vue';
@@ -12,9 +14,9 @@ import StudentAssignmentView from '@/views/StudentAssignmentView.vue';
 import ClassAssignmentsView from '@/views/ClassAssignmentsView.vue';
 import AddAnnouncementView from '@/views/AddAnnouncementView.vue';
 import TeacherAssignmentView from '@/views/TeacherAssignmentView.vue';
-import { store } from '@/main.js';
 import SubmissionView from '@/views/SubmissionView.vue';
 import ResourcesView from '@/views/ResourcesView.vue';
+
 const router = createRouter({
     history: createWebHistory(),
     routes: [

@@ -45,50 +45,52 @@ const getTeacher = async (id) => {
 }
 
 onMounted(async () => {
-  try {
-    // If the user is a student, get the classrooms from the server
-    // using the student's ID and permission
-    // If the user is a teacher or admin, get the teacher's ID
-    // and use it to get the classrooms from the server
-    let classData = {}
-    if (store.getters.getPermissions === "student") {
-      const response = await axios.get("http://localhost:3000/classrooms/get", {
-        params: { 
-          ID: store.getters.getId,
-          PERMISSION: store.getters.getPermissions
-        }
-      })
-      classData = response.data
-    } else {
-      const teacher = await axios.get("http://localhost:3000/teacher/get/user", {
-        params: {
-          ID: store.getters.getId
-        }
-      })
-      const teacher_id = teacher.data.teacher_id
-      const response = await axios.get("http://localhost:3000/classrooms/get", {
-        params: { 
-          ID: store.getters.getId,
-          PERMISSION: store.getters.getPermissions,
-          TEACHER_ID: teacher_id
-        }
-      })
-      console.log(response)
-      classData = response.data
-    }
+  if (store.getters.isLoggedIn) {
+    try {
+      // If the user is a student, get the classrooms from the server
+      // using the student's ID and permission
+      // If the user is a teacher or admin, get the teacher's ID
+      // and use it to get the classrooms from the server
+      let classData = {}
+      if (store.getters.getPermissions === "student") {
+        const response = await axios.get("http://localhost:3000/classrooms/get", {
+          params: { 
+            ID: store.getters.getId,
+            PERMISSION: store.getters.getPermissions
+          }
+        })
+        classData = response.data
+      } else {
+        const teacher = await axios.get("http://localhost:3000/teacher/get/user", {
+          params: {
+            ID: store.getters.getId
+          }
+        })
+        const teacher_id = teacher.data.teacher_id
+        const response = await axios.get("http://localhost:3000/classrooms/get", {
+          params: { 
+            ID: store.getters.getId,
+            PERMISSION: store.getters.getPermissions,
+            TEACHER_ID: teacher_id
+          }
+        })
+        console.log(response)
+        classData = response.data
+      }
 
-    // For each classroom, get the teacher's username
-    // and add it to the classroom object
-    for (const classroom of classData) {
-      const teacher = await getTeacher(classroom.teacher_id)
-      classroom.teacher = teacher
-    }
+      // For each classroom, get the teacher's username
+      // and add it to the classroom object
+      for (const classroom of classData) {
+        const teacher = await getTeacher(classroom.teacher_id)
+        classroom.teacher = teacher
+      }
 
-    // Set the reactive reference to the array of classrooms
-    classes.value = classData
-  } catch (error) {
-    // Log any errors to the console
-    console.error("Error loading classrooms:", error)
+      // Set the reactive reference to the array of classrooms
+      classes.value = classData
+    } catch (error) {
+      // Log any errors to the console
+      console.error("Error loading classrooms:", error)
+    }
   }
 })
 </script>
