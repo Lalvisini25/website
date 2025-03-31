@@ -7,7 +7,6 @@ import jwt from 'jsonwebtoken';
 export const login = (req, res) => {
   // Extract USERNAME and PASSWORD from the request body
   const { USERNAME, PASSWORD } = req.body;
-  console.log(connection)
 
   // Query the database to find a user with the provided username
   connection.query("SELECT * FROM users WHERE username = ?", [USERNAME], (err, results) => {

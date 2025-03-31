@@ -39,23 +39,19 @@ const handleSignup = async () => {
     const response = await axios.post("http://localhost:3000/signup", signupDetails)
     console.log(response)
     state.signupResponse = response.data
-    console.log(state.signupResponse.message)
-    if (state.signupResponse.message == null) {
+    if (state.signupResponse.error === "Username already exists") {
       return state.signupResponse = "Username already exists"
+    } else if (state.signupResponse.message.startsWith("User registered")) {
+      // If the signup was successful, call the handleLogin function
+      console.log('Successful signup')
+      handleLogin(state.user.username, state.user.password, store)
     }
   } catch(error) {
     // If there is an error, set the signup response to the error message
     state.signupResponse = error.response.data
     console.log(state.signupResponse)
-  } finally {
-    // If the signup was successful, call the handleLogin function
-    if (state.signupResponse.message.slice(0,21) === "Successfully inserted") {
-      console.log('Successful signup')
-      handleLogin(state.user.username, state.user.password, store)
-    } else {
-      console.log("pass")
-    }
   }
+
 }
 </script>
 

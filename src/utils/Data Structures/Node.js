@@ -14,3 +14,5 @@ export class Node {
         return this.data
     }
 }
+
+
